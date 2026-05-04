@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mitt Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="logo">📊 Mitt Dashboard</span>
+    </div>
+    <div class="topbar-center">
+      <div id="clock" class="clock"></div>
+      <div id="date" class="date"></div>
+    </div>
+    <div class="topbar-right">
+      <button id="theme-toggle" class="icon-btn" title="Bytt tema">🌙</button>
+      <button id="refresh-btn" class="icon-btn" title="Oppdater alle">🔄</button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+
+    <!-- Vær -->
+    <section class="widget widget-weather" id="widget-weather">
+      <div class="widget-header">
+        <h2>🌤 Vær</h2>
+        <button class="icon-btn small" id="weather-settings-btn" title="Innstillinger">⚙️</button>
+      </div>
+      <div id="weather-settings" class="settings-panel hidden">
+        <label>Sted (lat, lon):
+          <input type="text" id="weather-lat" placeholder="59.9139" style="width:80px" />
+          <input type="text" id="weather-lon" placeholder="10.7522" style="width:80px" />
+        </label>
+        <label>Stedsnavn: <input type="text" id="weather-city" placeholder="Oslo" /></label>
+        <button id="weather-save" class="btn-sm">Lagre</button>
+      </div>
+      <div id="weather-current" class="weather-current">
+        <div class="weather-icon" id="weather-icon">—</div>
+        <div class="weather-temp" id="weather-temp">—</div>
+        <div class="weather-desc" id="weather-desc">Laster...</div>
+        <div class="weather-meta">
+          <span id="weather-wind">💨 —</span>
+          <span id="weather-humidity">💧 —</span>
+        </div>
+      </div>
+      <div id="weather-forecast" class="weather-forecast"></div>
+    </section>
+
+    <!-- Planer / Todo -->
+    <section class="widget widget-todo" id="widget-todo">
+      <div class="widget-header">
+        <h2>📋 Planer</h2>
+        <div class="tab-group">
+          <button class="tab active" data-tab="todo">Gjøremål</button>
+          <button class="tab" data-tab="projects">Prosjekter</button>
+        </div>
+      </div>
+
+      <div id="tab-todo" class="tab-content active">
+        <div class="todo-input-row">
+          <input type="text" id="todo-input" placeholder="Legg til gjøremål..." />
+          <select id="todo-priority">
+            <option value="high">🔴 Høy</option>
+            <option value="medium" selected>🟡 Middels</option>
+            <option value="low">🟢 Lav</option>
+          </select>
+          <button id="todo-add" class="btn-primary">+</button>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" data-filter="all">Alle</button>
+          <button class="filter-btn" data-filter="active">Aktive</button>
+          <button class="filter-btn" data-filter="done">Ferdige</button>
+        </div>
+        <ul id="todo-list" class="todo-list"></ul>
+        <div id="todo-stats" class="todo-stats"></div>
+      </div>
+
+      <div id="tab-projects" class="tab-content">
+        <div class="todo-input-row">
+          <input type="text" id="project-name" placeholder="Prosjektnavn..." />
+          <input type="text" id="project-deadline" placeholder="Frist (valgfri)" style="width:120px" />
+          <button id="project-add" class="btn-primary">+</button>
+        </div>
+        <ul id="project-list" class="project-list"></ul>
+      </div>
+    </section>
+
+    <!-- Aksjer -->
+    <section class="widget widget-stocks" id="widget-stocks">
+      <div class="widget-header">
+        <h2>📈 Aksjer</h2>
+        <button class="icon-btn small" id="stock-add-btn" title="Legg til aksje">+</button>
+      </div>
+      <div id="stock-add-form" class="settings-panel hidden">
+        <input type="text" id="stock-symbol-input" placeholder="Symbol (f.eks. AAPL, EQNR.OL)" />
+        <input type="text" id="stock-name-input" placeholder="Navn (valgfri)" />
+        <input type="number" id="stock-qty-input" placeholder="Antall" min="0" step="0.01" />
+        <input type="number" id="stock-cost-input" placeholder="Snittkostnad" min="0" step="0.01" />
+        <button id="stock-save-btn" class="btn-sm">Legg til</button>
+      </div>
+      <div id="stock-api-warning" class="warning-box hidden">
+        Aksjekurser hentes direkte fra Yahoo Finance. Klikk 🔄 for å oppdatere.
+      </div>
+      <div id="stock-list" class="stock-list">
+        <div class="loading">Laster aksjer...</div>
+      </div>
+      <div id="stock-total" class="stock-total hidden"></div>
+    </section>
+
+    <!-- Notater -->
+    <section class="widget widget-notes" id="widget-notes">
+      <div class="widget-header">
+        <h2>📝 Notater</h2>
+        <div style="display:flex;gap:4px">
+          <button class="icon-btn small" id="note-new-btn" title="Nytt notat">+</button>
+          <button class="icon-btn small" id="note-delete-btn" title="Slett notat">🗑</button>
+        </div>
+      </div>
+      <div class="notes-container">
+        <div id="notes-sidebar">
+          <ul id="notes-list"></ul>
+        </div>
+        <div id="notes-editor">
+          <input type="text" id="note-title" placeholder="Tittel..." class="note-title-input" />
+          <textarea id="note-content" placeholder="Skriv notat her..."></textarea>
+          <div class="note-saved-indicator" id="note-saved">Lagret ✓</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Minikalender -->
+    <section class="widget widget-calendar" id="widget-calendar">
+      <div class="widget-header">
+        <h2>📅 Kalender</h2>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="icon-btn small" id="cal-prev">‹</button>
+          <span id="cal-month-label"></span>
+          <button class="icon-btn small" id="cal-next">›</button>
+        </div>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+      <div id="cal-events" class="cal-events">
+        <div class="cal-events-title">Hendelser</div>
+        <div id="cal-event-input-row" class="todo-input-row" style="margin-top:6px">
+          <input type="text" id="cal-event-input" placeholder="Legg til hendelse..." />
+          <button id="cal-event-add" class="btn-primary">+</button>
+        </div>
+        <ul id="cal-event-list"></ul>
+      </div>
+    </section>
+
+    <!-- Diverse / Krypto & Valuta -->
+    <section class="widget widget-misc" id="widget-misc">
+      <div class="widget-header">
+        <h2>🌐 Diverse</h2>
+      </div>
+      <div class="misc-tabs">
+        <button class="tab active" data-misc-tab="crypto">Krypto</button>
+        <button class="tab" data-misc-tab="currency">Valuta</button>
+        <button class="tab" data-misc-tab="links">Snarveier</button>
+      </div>
+
+      <div id="misc-crypto" class="misc-panel active">
+        <div id="crypto-list" class="stock-list">
+          <div class="loading">Laster...</div>
+        </div>
+      </div>
+
+      <div id="misc-currency" class="misc-panel">
+        <div id="currency-list" class="currency-list">
+          <div class="loading">Laster valutakurser...</div>
+        </div>
+      </div>
+
+      <div id="misc-links" class="misc-panel">
+        <div class="links-input-row">
+          <input type="text" id="link-name-input" placeholder="Navn" style="width:90px" />
+          <input type="text" id="link-url-input" placeholder="URL" />
+          <button id="link-add-btn" class="btn-primary">+</button>
+        </div>
+        <div id="links-grid" class="links-grid"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
