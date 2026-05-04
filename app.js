@@ -569,50 +569,6 @@ $('cal-event-list').addEventListener('click', e => {
 renderCalendar();
 renderCalEventList();
 
-/* ===== Misc: Crypto ===== */
-async function fetchCrypto() {
-  try {
-    const url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,cardano&vs_currencies=nok,usd&include_24hr_change=true';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    const list = $('crypto-list');
-    list.innerHTML = '';
-
-    const COINS = [
-      { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' },
-      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
-      { id: 'solana', name: 'Solana', symbol: 'SOL' },
-      { id: 'cardano', name: 'Cardano', symbol: 'ADA' },
-    ];
-
-    COINS.forEach(c => {
-      const d = data[c.id];
-      if (!d) return;
-      const change = d.nok_24h_change || 0;
-      const item = document.createElement('div');
-      item.className = 'stock-item';
-      item.innerHTML = `
-        <span class="stock-symbol">${c.symbol}</span>
-        <span class="stock-name">${c.name}</span>
-        <span class="stock-price">${formatNOK(d.nok)}</span>
-        <span class="stock-change ${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span>
-      `;
-      list.appendChild(item);
-    });
-  } catch {
-    $('crypto-list').innerHTML = '<div class="error-msg">Kunne ikke hente kryptokurser</div>';
-  }
-}
-
-function formatNOK(val) {
-  if (val >= 1000000) return `${(val/1000000).toFixed(2)}M NOK`;
-  if (val >= 1000) return `${Math.round(val).toLocaleString('no-NO')} NOK`;
-  return `${val.toFixed(2)} NOK`;
-}
-
-fetchCrypto();
-
 /* ===== Misc: Currency ===== */
 async function fetchCurrency() {
   try {
@@ -715,7 +671,6 @@ document.querySelectorAll('[data-misc-tab]').forEach(btn => {
 $('refresh-btn').addEventListener('click', () => {
   fetchWeather();
   renderStocks();
-  fetchCrypto();
   fetchCurrency();
   const btn = $('refresh-btn');
   btn.style.transform = 'rotate(360deg)';
@@ -727,7 +682,6 @@ $('refresh-btn').addEventListener('click', () => {
 setInterval(() => {
   fetchWeather();
   renderStocks();
-  fetchCrypto();
   fetchCurrency();
 }, 5 * 60 * 1000);
 
